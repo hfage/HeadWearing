@@ -1,12 +1,12 @@
 package com.example.headwearing;
 
-
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -22,6 +22,7 @@ public class HeadWear extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_head_wear);
+		registerReceiver(mBLEDateUpdateReciver,makeBLEIntentFilter());
 	}
 	
 	@Override
@@ -94,5 +95,21 @@ public class HeadWear extends Activity {
 
         	return super.onKeyDown(keyCode, event);
         }
+    }
+	
+	private final BroadcastReceiver mBLEDateUpdateReciver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if(BLEDevice.BLE_CONNECT_DEVICE.equals(action)){
+            	
+            }
+        }
+	};
+	
+	private static IntentFilter makeBLEIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BLEDevice.BLE_CONNECT_DEVICE);
+        return intentFilter;
     }
 }

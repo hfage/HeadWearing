@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class BLEDevice extends ListActivity {
-	public final static String BLE_CONNECT_SERVICE = "BLE CONNECT SERVICE";
+	public final static String BLE_CONNECT_DEVICE = "BLE CONNECT DEVICE";
 	public final static String BLE_DEVICE_NAME = "BLE DEVICE NAME";
 	public final static String BLE_DEVICE_ADDRESS = "BLE DEVICE ADDRESS";
 	
@@ -136,7 +136,7 @@ public class BLEDevice extends ListActivity {
         final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
         if (device == null) return;
         
-        final Intent intent = new Intent(BLE_CONNECT_SERVICE);
+        final Intent intent = new Intent(BLE_CONNECT_DEVICE);
         mDeviceName = device.getName();
         mDeviceAddress = device.getAddress();
         intent.putExtra(BLE_DEVICE_NAME, device.getName());
