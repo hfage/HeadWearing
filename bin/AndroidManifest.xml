@@ -33,6 +33,8 @@
         <activity android:name="com.example.headwearing.BLEDevice"
             	  android:theme="@android:style/Theme.Holo.Dialog"
                   android:configChanges="orientation|keyboardHidden" />
+    
+    <service android:name="com.example.headwearing.BluetoothLeService" android:enabled="true"/>
     </application>
 
 </manifest>

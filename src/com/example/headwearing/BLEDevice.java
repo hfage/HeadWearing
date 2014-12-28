@@ -31,6 +31,8 @@ import java.util.ArrayList;
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class BLEDevice extends ListActivity {
+	public static boolean DEBUG = true;
+	public static String TAG = "testBLEDevice";
 	public final static String BLE_CONNECT_DEVICE = "BLE CONNECT DEVICE";
 	public final static String BLE_DEVICE_NAME = "BLE DEVICE NAME";
 	public final static String BLE_DEVICE_ADDRESS = "BLE DEVICE ADDRESS";
@@ -45,7 +47,7 @@ public class BLEDevice extends ListActivity {
     //private DeviceControlService mDeviceControlActivity;
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 2000;
+    private static final long SCAN_PERIOD = 5000;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -142,6 +144,9 @@ public class BLEDevice extends ListActivity {
         intent.putExtra(BLE_DEVICE_NAME, device.getName());
         intent.putExtra(BLE_DEVICE_ADDRESS, device.getAddress());
         sendBroadcast(intent);
+        if(DEBUG){
+        	Log.i(TAG,"sentBroadcast");
+        }
         if (mScanning) {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mScanning = false;

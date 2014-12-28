@@ -1,22 +1,33 @@
 package com.example.headwearing;
 
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class HeadWear extends Activity {
 	public static boolean DEBUG = true;
+	public static String TAG = "testHeadWear";
 	public static boolean mBLEDeviceConnected = false;
 	public static boolean mBLEDeviceConnecting = true;
+	
+	private String mDeviceName = "";
+	private String mDeviceAddress = "";
+	
+	private BluetoothLeService mBluetoothLeService = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +108,48 @@ public class HeadWear extends Activity {
         }
     }
 	
+	private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+        	mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+            Log.i("test","HeadWear onServiceConnected");
+            if(!mBluetoothLeService.connect(mDeviceAddress)){
+            	if(DEBUG){
+            		Log.e(TAG,"Can not connect to the device: " + mDeviceAddress );
+            	}
+            	unbindService(mServiceConnection);
+            	Toast.makeText(HeadWear.this, "Can not connect to the device: " + mDeviceAddress ,Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+        	mBluetoothLeService = null;
+        }
+    };
+	
 	private final BroadcastReceiver mBLEDateUpdateReciver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
+            if(DEBUG){
+            	Log.i(TAG,"onReceive : " + action);
+            }
             if(BLEDevice.BLE_CONNECT_DEVICE.equals(action)){
-            	
+            	mDeviceName = intent.getStringExtra(BLEDevice.BLE_DEVICE_NAME);
+            	mDeviceAddress = intent.getStringExtra(BLEDevice.BLE_DEVICE_ADDRESS);
+            	Intent gattServiceIntent = new Intent(HeadWear.this, BluetoothLeService.class);
+                if(bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE)){
+                	Log.i(TAG,"bindsuccessfully");
+                	
+                }
+                else{
+                	Log.i(TAG,"bind un successfully");
+                }
+                if(DEBUG){
+                	Log.i(TAG,"bindService");
+                }
             }
         }
 	};
