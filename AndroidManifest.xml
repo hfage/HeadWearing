@@ -35,6 +35,7 @@
                   android:configChanges="orientation|keyboardHidden" />
     
     <service android:name="com.example.headwearing.BluetoothLeService" android:enabled="true"/>
+    <service android:name="com.example.headwearing.DataHandlerService" android:enabled="true"/>
     </application>
 
 </manifest>

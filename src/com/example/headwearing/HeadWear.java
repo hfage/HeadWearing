@@ -28,6 +28,7 @@ public class HeadWear extends Activity {
 	private String mDeviceAddress = "";
 	
 	private BluetoothLeService mBluetoothLeService = null;
+	private DataHandlerService mDataHandlerService = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,7 @@ public class HeadWear extends Activity {
         }
     }
 	
-	private final ServiceConnection mServiceConnection = new ServiceConnection() {
+	private final ServiceConnection mBLEServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
@@ -118,7 +119,7 @@ public class HeadWear extends Activity {
             	if(DEBUG){
             		Log.e(TAG,"Can not connect to the device: " + mDeviceAddress );
             	}
-            	unbindService(mServiceConnection);
+            	unbindService(mBLEServiceConnection);
             	Toast.makeText(HeadWear.this, "Can not connect to the device: " + mDeviceAddress ,Toast.LENGTH_SHORT).show();
             }
         }
@@ -126,6 +127,23 @@ public class HeadWear extends Activity {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
         	mBluetoothLeService = null;
+        }
+    };
+    
+    private final ServiceConnection mDataHandlerServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+        	mDataHandlerService = ((DataHandlerService.LocalBinder) service).getService();
+            Log.i("test","HeadWear onServiceConnected mDataHandlerServiceConnection");
+            if(!mDataHandlerService.init()){
+            	unbindService(mBLEServiceConnection);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+        	mDataHandlerService = null;
         }
     };
 	
@@ -140,7 +158,7 @@ public class HeadWear extends Activity {
             	mDeviceName = intent.getStringExtra(BLEDevice.BLE_DEVICE_NAME);
             	mDeviceAddress = intent.getStringExtra(BLEDevice.BLE_DEVICE_ADDRESS);
             	Intent gattServiceIntent = new Intent(HeadWear.this, BluetoothLeService.class);
-                if(bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE)){
+                if(bindService(gattServiceIntent, mBLEServiceConnection, BIND_AUTO_CREATE)){
                 	Log.i(TAG,"bindsuccessfully");
                 	
                 }
@@ -150,6 +168,8 @@ public class HeadWear extends Activity {
                 if(DEBUG){
                 	Log.i(TAG,"bindService");
                 }
+                Intent dataHandlerServiceIntent = new Intent(HeadWear.this, DataHandlerService.class);
+                bindService(dataHandlerServiceIntent, mDataHandlerServiceConnection, BIND_AUTO_CREATE);
             }
         }
 	};
