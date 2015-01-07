@@ -1,6 +1,14 @@
 package com.example.headwearing;
 
 
+import java.util.ArrayList;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.ChartData;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -35,6 +43,33 @@ public class HeadWear extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_head_wear);
 		registerReceiver(mBLEDateUpdateReciver,makeBLEIntentFilter());
+		LineChart chart = (LineChart) findViewById(R.id.chart);
+		chart.setDescription("hello!");
+		//chart.setDrawYValues(true);
+		
+		ArrayList<Entry> valsComp1 = new ArrayList<Entry>();
+	    ArrayList<Entry> valsComp2 = new ArrayList<Entry>();
+	    Entry c1e1 = new Entry(100.000f, 0); // 0 == quarter 1
+	    valsComp1.add(c1e1);
+	    Entry c1e2 = new Entry(50.000f, 1); // 1 == quarter 2 ...
+	    valsComp1.add(c1e2);
+	    // and so on ...
+
+	    Entry c2e1 = new Entry(120.000f, 0); // 0 == quarter 1
+	    valsComp2.add(c2e1);
+	    Entry c2e2 = new Entry(110.000f, 1); // 1 == quarter 2 ...
+	    valsComp2.add(c2e2);
+	    LineDataSet setComp1 = new LineDataSet(valsComp1, "Company 1");
+	    LineDataSet setComp2 = new LineDataSet(valsComp2, "Company 2");
+	    ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
+	    dataSets.add(setComp1);
+	    dataSets.add(setComp2);
+
+	    ArrayList<String> xVals = new ArrayList<String>();
+	    xVals.add("1.Q"); xVals.add("2.Q"); xVals.add("3.Q"); xVals.add("4.Q"); 
+
+	    LineData data = new LineData(xVals, dataSets);
+	    chart.setData(data);
 	}
 	
 	@Override

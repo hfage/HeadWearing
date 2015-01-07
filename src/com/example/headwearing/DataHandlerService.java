@@ -1,5 +1,7 @@
 package com.example.headwearing;
 
+import java.util.BitSet;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +10,7 @@ import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+
 
 public class DataHandlerService extends Service{
 	public boolean DEBUG = true;
@@ -49,6 +52,8 @@ public class DataHandlerService extends Service{
 	
 	public void dataHandler(String data){
 		if(DEBUG)Log.i(TAG,"dataHandler data: " + data);
+		BitSet bit = new BitSet(100);
+		bit.set(1);
 	}
 	 
 	public class LocalBinder extends Binder {
