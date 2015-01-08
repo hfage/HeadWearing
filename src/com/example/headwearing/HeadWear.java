@@ -3,11 +3,20 @@ package com.example.headwearing;
 
 import java.util.ArrayList;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.XLabels;
+import com.github.mikephil.charting.utils.XLabels.XLabelPosition;
+import com.github.mikephil.charting.utils.YLabels;
+import com.github.mikephil.charting.utils.YLabels.YLabelPosition;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,58 +27,72 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 public class HeadWear extends Activity {
 	public static boolean DEBUG = true;
+	public static boolean viewAcceleration = true;
 	public static String TAG = "testHeadWear";
 	public static boolean mBLEDeviceConnected = false;
 	public static boolean mBLEDeviceConnecting = true;
+	public static float YRANGE_MIN = 0f;
+	public static float YRANGE_MAX = 128f;
 	
 	private String mDeviceName = "";
 	private String mDeviceAddress = "";
 	
 	private BluetoothLeService mBluetoothLeService = null;
 	private DataHandlerService mDataHandlerService = null;
+	private BarChart mChart;
+	private ArrayList<String> xVals = new ArrayList<String>();;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_head_wear);
 		registerReceiver(mBLEDateUpdateReciver,makeBLEIntentFilter());
-		LineChart chart = (LineChart) findViewById(R.id.chart);
-		chart.setDescription("hello!");
-		//chart.setDrawYValues(true);
+		mChart = (BarChart) findViewById(R.id.chart);
+		if(viewAcceleration){
+			mChart.setDrawYValues(true);
+			mChart.setDescription("");
+			mChart.setMaxVisibleValueCount(5);
+			mChart.set3DEnabled(false);
+			mChart.setPinchZoom(false);
+			mChart.setUnit(" du");
+			mChart.setDrawGridBackground(true);
+			mChart.setDrawHorizontalGrid(true);
+			mChart.setDrawVerticalGrid(false);
+			mChart.setValueTextSize(10f);
+			mChart.setDrawBorder(false);
+			mChart.setYRange(YRANGE_MIN, YRANGE_MAX, true);
+			xVals.add("X");
+			xVals.add("Y");
+			xVals.add("Z");
+			setData(30,40,50);
+		}else{
+			mChart.setVisibility(View.GONE);
+		}
 		
-		ArrayList<Entry> valsComp1 = new ArrayList<Entry>();
-	    ArrayList<Entry> valsComp2 = new ArrayList<Entry>();
-	    Entry c1e1 = new Entry(100.000f, 0); // 0 == quarter 1
-	    valsComp1.add(c1e1);
-	    Entry c1e2 = new Entry(50.000f, 1); // 1 == quarter 2 ...
-	    valsComp1.add(c1e2);
-	    // and so on ...
-
-	    Entry c2e1 = new Entry(120.000f, 0); // 0 == quarter 1
-	    valsComp2.add(c2e1);
-	    Entry c2e2 = new Entry(110.000f, 1); // 1 == quarter 2 ...
-	    valsComp2.add(c2e2);
-	    LineDataSet setComp1 = new LineDataSet(valsComp1, "Company 1");
-	    LineDataSet setComp2 = new LineDataSet(valsComp2, "Company 2");
-	    ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
-	    dataSets.add(setComp1);
-	    dataSets.add(setComp2);
-
-	    ArrayList<String> xVals = new ArrayList<String>();
-	    xVals.add("1.Q"); xVals.add("2.Q"); xVals.add("3.Q"); xVals.add("4.Q"); 
-
-	    LineData data = new LineData(xVals, dataSets);
-	    chart.setData(data);
+	}
+	
+	public void setData(float x, float y, float z){
+		ArrayList<BarEntry> yVals = new ArrayList<BarEntry>();
+		yVals.add(new BarEntry(x, 0));
+		yVals.add(new BarEntry(y, 1));
+		yVals.add(new BarEntry(z, 2));
+		BarDataSet bardataset = new BarDataSet(yVals, "Acceleration");
+		ArrayList<BarDataSet> arraybardataset = new ArrayList<BarDataSet>();
+		arraybardataset.add(bardataset);
+		BarData data = new BarData(xVals, arraybardataset);
+		mChart.setData(data);
 	}
 	
 	@Override
