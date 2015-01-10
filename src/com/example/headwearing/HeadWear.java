@@ -27,6 +27,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -39,11 +40,12 @@ import android.widget.Toast;
 
 public class HeadWear extends Activity {
 	public static boolean DEBUG = true;
+	public static String DRAW_BARCHART = "DRAW BAR CHART";
 	public static boolean viewAcceleration = true;
 	public static String TAG = "testHeadWear";
 	public static boolean mBLEDeviceConnected = false;
 	public static boolean mBLEDeviceConnecting = true;
-	public static float YRANGE_MIN = 0f;
+	public static float YRANGE_MIN = -128f;
 	public static float YRANGE_MAX = 128f;
 	
 	private String mDeviceName = "";
@@ -51,48 +53,146 @@ public class HeadWear extends Activity {
 	
 	private BluetoothLeService mBluetoothLeService = null;
 	private DataHandlerService mDataHandlerService = null;
-	private BarChart mChart;
-	private ArrayList<String> xVals = new ArrayList<String>();;
+	private BarChart mBarChart;
+	private ArrayList<String> xVals = new ArrayList<String>();
+	private LineChart mLineChart1;
+	private LineChart mLineChart2;
+	private LineChart mLineChart3;
+	private ArrayList<String> xLineChartVals = new ArrayList<String>();
+	private int xLineChartLen = 150;
+	private ArrayList<Entry> yLineChartVals1 = new ArrayList<Entry>();
+	private ArrayList<Entry> yLineChartVals2 = new ArrayList<Entry>();
+	private ArrayList<Entry> yLineChartVals3 = new ArrayList<Entry>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_head_wear);
 		registerReceiver(mBLEDateUpdateReciver,makeBLEIntentFilter());
-		mChart = (BarChart) findViewById(R.id.chart);
+		mBarChart = (BarChart) findViewById(R.id.barchart);
 		if(viewAcceleration){
-			mChart.setDrawYValues(true);
-			mChart.setDescription("");
-			mChart.setMaxVisibleValueCount(5);
-			mChart.set3DEnabled(false);
-			mChart.setPinchZoom(false);
-			mChart.setUnit(" du");
-			mChart.setDrawGridBackground(true);
-			mChart.setDrawHorizontalGrid(true);
-			mChart.setDrawVerticalGrid(false);
-			mChart.setValueTextSize(10f);
-			mChart.setDrawBorder(false);
-			mChart.setYRange(YRANGE_MIN, YRANGE_MAX, true);
+			mBarChart.setDrawYValues(false);
+			mBarChart.setDescription("");
+			mBarChart.setMaxVisibleValueCount(5);
+			mBarChart.set3DEnabled(false);
+			mBarChart.setPinchZoom(false);
+			mBarChart.setUnit(" du");
+			mBarChart.setDrawGridBackground(true);
+			mBarChart.setDrawHorizontalGrid(true);
+			mBarChart.setDrawVerticalGrid(false);
+			mBarChart.setValueTextSize(10f);
+			mBarChart.setDrawBorder(false);
+			mBarChart.setYRange(YRANGE_MIN, YRANGE_MAX, false);
 			xVals.add("X");
 			xVals.add("Y");
 			xVals.add("Z");
-			setData(30,40,50);
+			
+			mLineChart1 = (LineChart) findViewById(R.id.linechart1);
+			mLineChart1.setUnit(" du");
+			mLineChart1.setDrawUnitsInChart(true);
+			mLineChart1.setYRange(YRANGE_MIN, YRANGE_MAX, false);
+			mLineChart1.setDrawYValues(false);
+			mLineChart1.setDescription("");
+			mLineChart1.setTouchEnabled(true);
+			mLineChart1.setDragEnabled(true);
+
+			mLineChart2 = (LineChart) findViewById(R.id.linechart2);
+			mLineChart2.setUnit(" du");
+			mLineChart2.setDrawUnitsInChart(true);
+			mLineChart2.setYRange(YRANGE_MIN, YRANGE_MAX, false);
+			mLineChart2.setDrawYValues(false);
+			mLineChart2.setDescription("");
+			mLineChart2.setTouchEnabled(true);
+			mLineChart2.setDragEnabled(true);
+			
+			mLineChart3 = (LineChart) findViewById(R.id.linechart3);
+			mLineChart3.setUnit(" du");
+			mLineChart3.setDrawUnitsInChart(true);
+			mLineChart3.setYRange(YRANGE_MIN, YRANGE_MAX, false);
+			mLineChart3.setDrawYValues(false);
+			mLineChart3.setDescription("");
+			mLineChart3.setTouchEnabled(true);
+			mLineChart3.setDragEnabled(true);
+			
+			int i = 0;
+			while(i < xLineChartLen){
+				xLineChartVals.add("" + i);
+				yLineChartVals1.add(new Entry(110,i));
+				yLineChartVals2.add(new Entry(20,i));
+				yLineChartVals3.add(new Entry(30,i));
+				i++;
+			}
+
+			setBarChartData(0,0,0);
 		}else{
-			mChart.setVisibility(View.GONE);
+			mBarChart.setVisibility(View.GONE);
 		}
 		
 	}
 	
-	public void setData(float x, float y, float z){
+	public void setBarChartData(float x, float y, float z){
+		Log.i("","" + x + y + z);
 		ArrayList<BarEntry> yVals = new ArrayList<BarEntry>();
 		yVals.add(new BarEntry(x, 0));
 		yVals.add(new BarEntry(y, 1));
 		yVals.add(new BarEntry(z, 2));
 		BarDataSet bardataset = new BarDataSet(yVals, "Acceleration");
+		bardataset.setBarSpacePercent(30f);
 		ArrayList<BarDataSet> arraybardataset = new ArrayList<BarDataSet>();
 		arraybardataset.add(bardataset);
 		BarData data = new BarData(xVals, arraybardataset);
-		mChart.setData(data);
+		mBarChart.setData(data);
+		mBarChart.invalidate();
+		setLineChartData(x,y,z);
+	}
+	
+	public void setLineChartData(float x, float y, float z){
+		yLineChartVals1.remove(0);
+		yLineChartVals2.remove(0);
+		yLineChartVals3.remove(0);
+		int i = 0;
+		for(i = 0; i < xLineChartLen - 1; i++){
+			yLineChartVals1.get(i).setXIndex(i);
+			yLineChartVals2.get(i).setXIndex(i);
+			yLineChartVals3.get(i).setXIndex(i);
+		}
+		yLineChartVals1.add(new Entry(x,xLineChartLen - 1));
+		yLineChartVals2.add(new Entry(y,xLineChartLen - 1));
+		yLineChartVals3.add(new Entry(z,xLineChartLen - 1));
+		LineDataSet set; 
+		ArrayList<LineDataSet> linedataset;
+		LineData data;
+		
+		set = new LineDataSet(yLineChartVals1, "X");
+		set.setColor(Color.BLUE);
+		set.disableDashedLine();
+		set.setDrawCircles(false);
+		linedataset = new ArrayList<LineDataSet>();
+		linedataset.add(set);
+		data = new LineData(xLineChartVals, linedataset);
+		mLineChart1.setData(data);
+		mLineChart1.invalidate();
+		
+		set = new LineDataSet(yLineChartVals2, "Y");
+		set.setColor(Color.BLUE);
+		set.disableDashedLine();
+		set.setDrawCircles(false);
+		linedataset = new ArrayList<LineDataSet>();
+		linedataset.add(set);
+		data = new LineData(xLineChartVals, linedataset);
+		mLineChart2.setData(data);
+		mLineChart2.invalidate();
+		
+		set = new LineDataSet(yLineChartVals3, "Z");
+		set.setColor(Color.BLUE);
+		set.disableDashedLine();
+		set.setDrawCircles(false);
+		linedataset = new ArrayList<LineDataSet>();
+		linedataset.add(set);
+		data = new LineData(xLineChartVals, linedataset);
+		mLineChart3.setData(data);
+		mLineChart3.invalidate();
+		
 	}
 	
 	@Override
@@ -124,8 +224,12 @@ public class HeadWear extends Activity {
 		switch(id){
 			case R.id.menu_scan:{
 				if(!mBLEDeviceConnected){
-					Intent intent = new Intent(this,BLEDevice.class);
-					startActivity(intent);
+					//Intent intent = new Intent(this,BLEDevice.class);
+					//startActivity(intent);
+					Intent sendIntent = new Intent(BLEDevice.BLE_CONNECT_DEVICE);
+					sendIntent.putExtra(BLEDevice.BLE_DEVICE_NAME, "a");
+					sendIntent.putExtra(BLEDevice.BLE_DEVICE_ADDRESS, "a");
+					sendBroadcast(sendIntent);
 				}
 				break;
 			}
@@ -157,6 +261,12 @@ public class HeadWear extends Activity {
                     .setPositiveButton("È·¶¨",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                	if(mBluetoothLeService != null){
+                                		unbindService(mBLEServiceConnection);
+                                	}
+                                	if(mDataHandlerService != null){
+                                		unbindService(mDataHandlerServiceConnection);
+                                	}
                                     finish();
                                 }
                             }).show();
@@ -195,7 +305,7 @@ public class HeadWear extends Activity {
         	mDataHandlerService = ((DataHandlerService.LocalBinder) service).getService();
             Log.i("test","HeadWear onServiceConnected mDataHandlerServiceConnection");
             if(!mDataHandlerService.init()){
-            	unbindService(mBLEServiceConnection);
+            	unbindService(mDataHandlerServiceConnection);
             }
         }
 
@@ -228,6 +338,17 @@ public class HeadWear extends Activity {
                 }
                 Intent dataHandlerServiceIntent = new Intent(HeadWear.this, DataHandlerService.class);
                 bindService(dataHandlerServiceIntent, mDataHandlerServiceConnection, BIND_AUTO_CREATE);
+            }else if(DRAW_BARCHART.equals(action)){
+            	if(viewAcceleration){
+	            	float x,y,z;
+	            	x = intent.getFloatExtra("X", 0f);
+	            	x = 128 * (float) Math.sin(x / 100);
+	            	y = intent.getFloatExtra("Y", 0f);
+	            	y = 128 * (float) Math.cos(y / 100);
+	            	z = intent.getFloatExtra("Z", 0f);
+	            	z = 128 * (float) Math.tan(z / 100);
+	            	setBarChartData(x,y,z);
+            	}
             }
         }
 	};
@@ -235,6 +356,7 @@ public class HeadWear extends Activity {
 	private static IntentFilter makeBLEIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BLEDevice.BLE_CONNECT_DEVICE);
+        intentFilter.addAction(DRAW_BARCHART);
         return intentFilter;
     }
 }

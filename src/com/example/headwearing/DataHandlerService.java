@@ -35,7 +35,7 @@ public class DataHandlerService extends Service{
 	
 	public void dataSimulation(){
 		int n = 100;
-		while(n != 0){
+		while(n != -100){
 			Log.i(TAG,"dataSimulation n : " + n);
 			Intent intent = new Intent(DATA_SIMULATION);
 			intent.putExtra("data", "" + n);
@@ -54,6 +54,17 @@ public class DataHandlerService extends Service{
 		if(DEBUG)Log.i(TAG,"dataHandler data: " + data);
 		BitSet bit = new BitSet(100);
 		bit.set(1);
+		float x,y,z;
+		x = Integer.parseInt(data);
+		y = x;
+		z = x;
+		if(HeadWear.viewAcceleration){
+			Intent intent = new Intent(HeadWear.DRAW_BARCHART);
+			intent.putExtra("X", x);
+			intent.putExtra("Y", y);
+			intent.putExtra("Z", z);
+			sendBroadcast(intent);
+		}
 	}
 	 
 	public class LocalBinder extends Binder {

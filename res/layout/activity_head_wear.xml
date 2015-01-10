@@ -5,15 +5,33 @@
     android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}" >
 
-    
-	<com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/chart"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="300dip" />
-	
-	<com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart1"
-        android:layout_width="match_parent"
-        android:layout_height="300dip" />
-	
+        android:layout_height="match_parent" >
+
+        <LinearLayout 
+            android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical">
+			<com.github.mikephil.charting.charts.BarChart
+		        android:id="@+id/barchart"
+		        android:layout_width="match_parent"
+		        android:layout_height="300dip" />
+			
+			<com.github.mikephil.charting.charts.LineChart
+		        android:id="@+id/linechart1"
+		        android:layout_width="match_parent"
+		        android:layout_height="200dip" />
+			
+			<com.github.mikephil.charting.charts.LineChart
+		        android:id="@+id/linechart2"
+		        android:layout_width="match_parent"
+		        android:layout_height="200dip" />
+			
+			<com.github.mikephil.charting.charts.LineChart
+		        android:id="@+id/linechart3"
+		        android:layout_width="match_parent"
+		        android:layout_height="200dip" />
+		</LinearLayout>
+	</ScrollView>
 </LinearLayout>
