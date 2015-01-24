@@ -45,8 +45,7 @@ public class HeadWear extends Activity {
 	public static String TAG = "testHeadWear";
 	public static boolean mBLEDeviceConnected = false;
 	public static boolean mBLEDeviceConnecting = true;
-	public static float YRANGE_MIN = -128f;
-	public static float YRANGE_MAX = 128f;
+	
 	
 	private String mDeviceName = "";
 	private String mDeviceAddress = "";
@@ -59,7 +58,9 @@ public class HeadWear extends Activity {
 	private LineChart mLineChart2;
 	private LineChart mLineChart3;
 	private ArrayList<String> xLineChartVals = new ArrayList<String>();
-	private int xLineChartLen = 150;
+	private int xLineChartLen = 250;
+	public static float YRANGE_MIN = -128f;
+	public static float YRANGE_MAX = 128f;
 	private ArrayList<Entry> yLineChartVals1 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals2 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals3 = new ArrayList<Entry>();
@@ -341,12 +342,12 @@ public class HeadWear extends Activity {
             }else if(DRAW_BARCHART.equals(action)){
             	if(viewAcceleration){
 	            	float x,y,z;
-	            	x = intent.getFloatExtra("X", 0f);
-	            	x = 128 * (float) Math.sin(x / 100);
+	            	x = intent.getFloatExtra("X", 0f) * 128;
+	            	//x = 128 * (float) Math.sin(x / 100);
 	            	y = intent.getFloatExtra("Y", 0f);
-	            	y = 128 * (float) Math.cos(y / 100);
+	            	//y = 128 * (float) Math.cos(y / 100);
 	            	z = intent.getFloatExtra("Z", 0f);
-	            	z = 128 * (float) Math.tan(z / 100);
+	            	//z = 128 * (float) Math.tan(z / 100);
 	            	setBarChartData(x,y,z);
             	}
             }

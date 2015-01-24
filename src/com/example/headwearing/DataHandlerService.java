@@ -35,14 +35,25 @@ public class DataHandlerService extends Service{
 	
 	public void dataSimulation(){
 		int n = 100;
-		while(n != -100){
+		while(n != 100){
 			Log.i(TAG,"dataSimulation n : " + n);
 			Intent intent = new Intent(DATA_SIMULATION);
 			intent.putExtra("data", "" + n);
 			sendBroadcast(intent);
 			n--;
 			try {
-				Thread.sleep(100);
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		for(int i = 0; i < SampleGattAttributes.standing_acc[0].length/100; i++){
+			Intent intent = new Intent(DATA_SIMULATION);
+			intent.putExtra("data", ""+SampleGattAttributes.standing_acc[0][i]);
+			sendBroadcast(intent);
+			try {
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -55,7 +66,7 @@ public class DataHandlerService extends Service{
 		BitSet bit = new BitSet(100);
 		bit.set(1);
 		float x,y,z;
-		x = Integer.parseInt(data);
+		x = (float)Double.parseDouble(data);
 		y = x;
 		z = x;
 		if(HeadWear.viewAcceleration){
