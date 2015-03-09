@@ -5,6 +5,7 @@
     <string name="hello_world">Hello world!</string>
 	<string name="menu_scan">SCAN</string>
 	<string name="menu_stop">STOP</string>
+	<string name="testActivity">testActivity</string>
 	
 	<!-- In BLEDevice.java -->
 	<string name="ble_not_supported">BLE is not supported</string>

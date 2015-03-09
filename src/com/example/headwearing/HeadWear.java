@@ -36,6 +36,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 public class HeadWear extends Activity {
@@ -59,8 +60,8 @@ public class HeadWear extends Activity {
 	private LineChart mLineChart3;
 	private ArrayList<String> xLineChartVals = new ArrayList<String>();
 	private int xLineChartLen = 250;
-	public static float YRANGE_MIN = -128f;
-	public static float YRANGE_MAX = 128f;
+	public static float YRANGE_MIN = -6f;
+	public static float YRANGE_MAX = 6f;
 	private ArrayList<Entry> yLineChartVals1 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals2 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals3 = new ArrayList<Entry>();
@@ -128,7 +129,11 @@ public class HeadWear extends Activity {
 		}else{
 			mBarChart.setVisibility(View.GONE);
 		}
-		
+//		WebView mWebView = (WebView) findViewById(R.id.wv);
+//		mWebView.getSettings().setJavaScriptEnabled(true);
+//		//requestFocus();
+//		mWebView.requestFocus();
+//		mWebView.loadUrl("http://www.baidu.com");
 	}
 	
 	public void setBarChartData(float x, float y, float z){
@@ -342,7 +347,8 @@ public class HeadWear extends Activity {
             }else if(DRAW_BARCHART.equals(action)){
             	if(viewAcceleration){
 	            	float x,y,z;
-	            	x = intent.getFloatExtra("X", 0f) * 128;
+	            	x = intent.getFloatExtra("X", 0f);
+	            	Log.w(TAG,""+x);
 	            	//x = 128 * (float) Math.sin(x / 100);
 	            	y = intent.getFloatExtra("Y", 0f);
 	            	//y = 128 * (float) Math.cos(y / 100);
