@@ -21,6 +21,7 @@ import android.widget.Toast;
 public class DataHandlerService extends Service{
 	public boolean DEBUG = true;
 	public boolean simulation = true;
+	public static int LEN_OF_RECEIVED_DATA = 10;
 	private final static String TAG = "testDataHandlerSerivce";
 	public final static String DATA_SIMULATION = "DATA SIMULATION";
 	public final static String DATA_RECEIVE = "DATA RECEIVE";
@@ -49,13 +50,24 @@ public class DataHandlerService extends Service{
 	    }  
 	    BufferedReader reader = new BufferedReader(inputStreamReader);  
 	    String line;  
+	    String data_signal = "";
+	    String data_total = "";
 	    int limit = 1000;
+	    int delta = LEN_OF_RECEIVED_DATA;
 	    char c = '\t';
 	    try {  
 	        while ((line = reader.readLine()) != null) {  
-        		Intent intent = new Intent(DATA_SIMULATION);
-        		intent.putExtra("data", line.split(String.valueOf(c))[0]+"d"+line.split(String.valueOf(c))[1]+"d"+line.split(String.valueOf(c))[2]);
-        		sendBroadcast(intent);
+	        	data_signal = line.split(String.valueOf(c))[0]+"d"+line.split(String.valueOf(c))[1]+"d"+line.split(String.valueOf(c))[2];
+	        	data_total = data_total + data_signal + "&";
+	        	delta -= 1;
+	        	if(delta == 0){
+	        		Intent intent = new Intent(DATA_SIMULATION);
+	        		intent.putExtra("data", data_total);
+	        		sendBroadcast(intent);
+	        		data_signal = "";
+	        		data_total = "";
+	        		delta = LEN_OF_RECEIVED_DATA;
+	        	}
         		try {
     				Thread.sleep(10);
     			} catch (InterruptedException e) {
@@ -73,13 +85,20 @@ public class DataHandlerService extends Service{
 	}
 	
 	public void dataHandler(String data){
-		float x = 0,y = 0,z = 0;
+		float[] x = new float[LEN_OF_RECEIVED_DATA];
+		float[] y = new float[LEN_OF_RECEIVED_DATA];
+		float[] z = new float[LEN_OF_RECEIVED_DATA];
+		String[] data_signal = new String[LEN_OF_RECEIVED_DATA];
+		data_signal = data.split("&");
 		if(DEBUG)Log.i(TAG,"dataHandler data: " + data);
 		BitSet bit = new BitSet(100);
 		bit.set(1);
-		x = (float)Double.parseDouble(data.split("d")[0]);
-		y = (float)Double.parseDouble(data.split("d")[1]);
-		z = (float)Double.parseDouble(data.split("d")[2]);
+		for(int i = 0; i < LEN_OF_RECEIVED_DATA; i++){
+			Log.i(TAG,data_signal[i]);
+			x[i] = (float)Double.parseDouble(data_signal[i].split("d")[0]);
+			y[i] = (float)Double.parseDouble(data_signal[i].split("d")[1]);
+			z[i] = (float)Double.parseDouble(data_signal[i].split("d")[2]);
+		}
 		if(HeadWear.viewAcceleration){
 			Intent intent = new Intent(HeadWear.DRAW_BARCHART);
 			intent.putExtra("X", x);

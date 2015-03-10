@@ -60,8 +60,8 @@ public class HeadWear extends Activity {
 	private LineChart mLineChart3;
 	private ArrayList<String> xLineChartVals = new ArrayList<String>();
 	private int xLineChartLen = 250;
-	public static float YRANGE_MIN = -6f;
-	public static float YRANGE_MAX = 6f;
+	public static float YRANGE_MIN = 0.95f;
+	public static float YRANGE_MAX = 1f;
 	private ArrayList<Entry> yLineChartVals1 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals2 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals3 = new ArrayList<Entry>();
@@ -346,15 +346,19 @@ public class HeadWear extends Activity {
                 bindService(dataHandlerServiceIntent, mDataHandlerServiceConnection, BIND_AUTO_CREATE);
             }else if(DRAW_BARCHART.equals(action)){
             	if(viewAcceleration){
-	            	float x,y,z;
-	            	x = intent.getFloatExtra("X", 0f);
-	            	Log.w(TAG,""+x);
+            		float[] x = new float[DataHandlerService.LEN_OF_RECEIVED_DATA];
+            		float[] y = new float[DataHandlerService.LEN_OF_RECEIVED_DATA];
+            		float[] z = new float[DataHandlerService.LEN_OF_RECEIVED_DATA];
+	            	
+	            	x = intent.getFloatArrayExtra("X");
 	            	//x = 128 * (float) Math.sin(x / 100);
-	            	y = intent.getFloatExtra("Y", 0f);
+	            	y = intent.getFloatArrayExtra("Y");
 	            	//y = 128 * (float) Math.cos(y / 100);
-	            	z = intent.getFloatExtra("Z", 0f);
+	            	z = intent.getFloatArrayExtra("Z");
 	            	//z = 128 * (float) Math.tan(z / 100);
-	            	setBarChartData(x,y,z);
+	            	for(int i = 0; i < DataHandlerService.LEN_OF_RECEIVED_DATA; i++){
+	            		setBarChartData(x[i],y[i],z[i]);
+	            	}
             	}
             }
         }
