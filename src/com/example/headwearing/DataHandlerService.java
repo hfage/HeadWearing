@@ -16,7 +16,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
+//import com.example.headwearing.MyDatas;
 
 public class DataHandlerService extends Service{
 	public boolean DEBUG = true;
@@ -25,7 +25,6 @@ public class DataHandlerService extends Service{
 	private final static String TAG = "testDataHandlerSerivce";
 	public final static String DATA_SIMULATION = "DATA SIMULATION";
 	public final static String DATA_RECEIVE = "DATA RECEIVE";
-	
 	public boolean init(){
 		registerReceiver(mReceiver, makeIntentFilter());
 		if(simulation){
@@ -52,7 +51,7 @@ public class DataHandlerService extends Service{
 	    String line;  
 	    String data_signal = "";
 	    String data_total = "";
-	    int limit = 1000;
+	    int limit = 1024;
 	    int delta = LEN_OF_RECEIVED_DATA;
 	    char c = '\t';
 	    try {  
@@ -84,20 +83,43 @@ public class DataHandlerService extends Service{
 	    } 
 	}
 	
+	MyDatas.SignalData sd1 = new MyDatas().new SignalData();
+	MyDatas.SignalData sd2 = new MyDatas().new SignalData();
 	public void dataHandler(String data){
 		float[] x = new float[LEN_OF_RECEIVED_DATA];
 		float[] y = new float[LEN_OF_RECEIVED_DATA];
 		float[] z = new float[LEN_OF_RECEIVED_DATA];
+		
+		
 		String[] data_signal = new String[LEN_OF_RECEIVED_DATA];
 		data_signal = data.split("&");
-		if(DEBUG)Log.i(TAG,"dataHandler data: " + data);
+		//if(DEBUG)Log.i(TAG,"dataHandler data: " + data);
 		BitSet bit = new BitSet(100);
 		bit.set(1);
 		for(int i = 0; i < LEN_OF_RECEIVED_DATA; i++){
-			Log.i(TAG,data_signal[i]);
+			//Log.i(TAG,data_signal[i]);
 			x[i] = (float)Double.parseDouble(data_signal[i].split("d")[0]);
 			y[i] = (float)Double.parseDouble(data_signal[i].split("d")[1]);
 			z[i] = (float)Double.parseDouble(data_signal[i].split("d")[2]);
+			
+			if(sd1.len == MyDatas.HALF_OF_SIGNAL_DATA){
+				sd2.used = true;
+			}
+			sd1.used = true;
+			if(sd1.used){
+				if(sd1.len == MyDatas.LEN_OF_SIGNAL_DATA){
+					sd1.calculate();
+					sd1.reset();
+				}
+				sd1.enData(x[i],y[i],z[i]);
+			}
+			if(sd2.used){
+				if(sd2.len == MyDatas.LEN_OF_SIGNAL_DATA){
+					sd2.calculate();
+					sd2.reset();
+				}
+				sd2.enData(x[i],y[i],z[i]);
+			}
 		}
 		if(HeadWear.viewAcceleration){
 			Intent intent = new Intent(HeadWear.DRAW_BARCHART);
