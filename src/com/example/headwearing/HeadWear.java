@@ -268,7 +268,14 @@ public class HeadWear extends Activity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                 	if(mBluetoothLeService != null){
-                                		unbindService(mBLEServiceConnection);
+                                		Log.e("mBluetoothLeService",mBluetoothLeService.toString());
+                                		try {
+                                			unbindService(mBLEServiceConnection);
+                        				} catch (Exception e) {
+                        					// TODO Auto-generated catch block
+                        					e.printStackTrace();
+                        				}
+                                		
                                 	}
                                 	if(mDataHandlerService != null){
                                 		unbindService(mDataHandlerServiceConnection);
