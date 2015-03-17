@@ -21,7 +21,7 @@ import android.widget.Toast;
 public class DataHandlerService extends Service{
 	public boolean DEBUG = true;
 	public boolean simulation = true;
-	public static int LEN_OF_RECEIVED_DATA = 10;
+	public static int LEN_OF_RECEIVED_DATA = 20;
 	private final static String TAG = "testDataHandlerSerivce";
 	public final static String DATA_SIMULATION = "DATA SIMULATION";
 	public final static String DATA_RECEIVE = "DATA RECEIVE";
@@ -85,12 +85,12 @@ public class DataHandlerService extends Service{
 	
 	MyDatas.SignalData sd1 = new MyDatas().new SignalData();
 	MyDatas.SignalData sd2 = new MyDatas().new SignalData();
+	
 	public void dataHandler(String data){
+		Log.e(TAG,"dataHandler");
 		float[] x = new float[LEN_OF_RECEIVED_DATA];
 		float[] y = new float[LEN_OF_RECEIVED_DATA];
 		float[] z = new float[LEN_OF_RECEIVED_DATA];
-		
-		
 		String[] data_signal = new String[LEN_OF_RECEIVED_DATA];
 		data_signal = data.split("&");
 		//if(DEBUG)Log.i(TAG,"dataHandler data: " + data);
@@ -103,22 +103,23 @@ public class DataHandlerService extends Service{
 			z[i] = (float)Double.parseDouble(data_signal[i].split("d")[2]);
 			
 			if(sd1.len == MyDatas.HALF_OF_SIGNAL_DATA){
-				sd2.used = true;
+				//sd2.used = true;
 			}
 			sd1.used = true;
 			if(sd1.used){
+				sd1.enData(x[i],y[i],z[i]);
+				Log.e("test",""+sd1.len);
 				if(sd1.len == MyDatas.LEN_OF_SIGNAL_DATA){
 					sd1.calculate();
-					sd1.reset();
+					sd1.resetDatas();
 				}
-				sd1.enData(x[i],y[i],z[i]);
 			}
 			if(sd2.used){
+				/*sd2.enData(x[i],y[i],z[i]);
 				if(sd2.len == MyDatas.LEN_OF_SIGNAL_DATA){
 					sd2.calculate();
-					sd2.reset();
-				}
-				sd2.enData(x[i],y[i],z[i]);
+					sd2.resetDatas();
+				}*/
 			}
 		}
 		if(HeadWear.viewAcceleration){

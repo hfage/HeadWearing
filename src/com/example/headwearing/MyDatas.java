@@ -31,9 +31,9 @@ class MyDatas{
 		public boolean enData(float x, float y, float z){
 			if(len < LEN_OF_SIGNAL_DATA){
 				len++;
-				if(len == 512)Log.e("test","512");
-				if(len == 513)Log.e("test","513");
-				if(len == 511)Log.e("test","511");
+				//if(len == 512)Log.e("test","512");
+				//if(len == 513)Log.e("test","513");
+				//if(len == 511)Log.e("test","511");
 				data_x.add(x);
 				data_y.add(y);
 				data_z.add(z);
@@ -46,9 +46,11 @@ class MyDatas{
 				data_z.remove(0);
 				data_z.add(z);
 			}
+			Log.e("test","endata"+len);
 			return true;
 		}
-		public boolean reset(){
+		public boolean resetDatas(){
+			Log.e(TAG,"reset");
 			data_x.clear();
 			data_y.clear();
 			data_z.clear();
@@ -68,12 +70,15 @@ class MyDatas{
 			return true;
 		}
 		public void calculate(){
+			Log.e(TAG,"calculate");
 			sum();
 			meanValue();
 			nVariance();
 			standardDeviation();
+			Log.e(TAG,"calculate over.");
 		}
 		public boolean standardDeviation(){
+			Log.i(TAG,"standardDeviation");
 			standard_deviation_x_value = (float) Math.sqrt(LEN_OF_SIGNAL_DATA * n_variance_x_value);
 			standard_deviation_y_value = (float) Math.sqrt(LEN_OF_SIGNAL_DATA * n_variance_y_value);
 			standard_deviation_z_value = (float) Math.sqrt(LEN_OF_SIGNAL_DATA * n_variance_z_value);
@@ -85,6 +90,7 @@ class MyDatas{
 			return true;
 		}
 		public boolean sum(){
+			Log.e(TAG,"sum");
 			if(len == LEN_OF_SIGNAL_DATA){
 				for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
 					total_x_value += data_x.get(i);
@@ -102,6 +108,7 @@ class MyDatas{
 			}
 		}
 		public boolean meanValue(){
+			Log.e(TAG,"meanValue");
 			if(len == LEN_OF_SIGNAL_DATA){
 				mean_x_value = total_x_value / LEN_OF_SIGNAL_DATA;
 				mean_y_value = total_y_value / LEN_OF_SIGNAL_DATA;
@@ -117,6 +124,7 @@ class MyDatas{
 			}
 		}
 		public boolean nVariance(){
+			Log.e(TAG,"nVariance");
 			for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
 				n_variance_x_value += Math.pow((data_x.get(i) - mean_x_value),2);
 				n_variance_y_value += Math.pow((data_y.get(i) - mean_y_value),2);
