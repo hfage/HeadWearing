@@ -87,7 +87,7 @@ public class DataHandlerService extends Service{
 	MyDatas.SignalData sd2 = new MyDatas().new SignalData();
 	
 	public void dataHandler(String data){
-		Log.e(TAG,"dataHandler");
+		//Log.e(TAG,"dataHandler");
 		float[] x = new float[LEN_OF_RECEIVED_DATA];
 		float[] y = new float[LEN_OF_RECEIVED_DATA];
 		float[] z = new float[LEN_OF_RECEIVED_DATA];
@@ -108,7 +108,7 @@ public class DataHandlerService extends Service{
 			sd1.used = true;
 			if(sd1.used){
 				sd1.enData(x[i],y[i],z[i]);
-				Log.e("test",""+sd1.len);
+				//Log.e("test",""+sd1.len);
 				if(sd1.len == MyDatas.LEN_OF_SIGNAL_DATA){
 					sd1.calculate();
 					sd1.resetDatas();

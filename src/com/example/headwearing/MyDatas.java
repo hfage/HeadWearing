@@ -27,27 +27,41 @@ class MyDatas{
 		float standard_deviation_x_value = 0f;
 		float standard_deviation_y_value = 0f;
 		float standard_deviation_z_value = 0f;
+		float skewness_x_value = 0f;
+		float skewness_y_value = 0f;
+		float skewness_z_value = 0f;
+		float fengdu_x_value = 0f;
+		float fengdu_y_value = 0f;
+		float fengdu_z_value = 0f;
 		public boolean used = false;
+		public boolean using = false;
+		public int error_time = 5;
 		public boolean enData(float x, float y, float z){
-			if(len < LEN_OF_SIGNAL_DATA){
-				len++;
-				//if(len == 512)Log.e("test","512");
-				//if(len == 513)Log.e("test","513");
-				//if(len == 511)Log.e("test","511");
-				data_x.add(x);
-				data_y.add(y);
-				data_z.add(z);
+			if(!using){
+				if(len < LEN_OF_SIGNAL_DATA){
+					len++;
+					data_x.add(x);
+					data_y.add(y);
+					data_z.add(z);
+				}else{
+					Log.e("test","else");
+					data_x.remove(0);
+					data_x.add(x);
+					data_y.remove(0);
+					data_y.add(y);
+					data_z.remove(0);
+					data_z.add(z);
+				}
+				//Log.e("test","endata"+len);
+				return true;
 			}else{
-				Log.e("test","else");
-				data_x.remove(0);
-				data_x.add(x);
-				data_y.remove(0);
-				data_y.add(y);
-				data_z.remove(0);
-				data_z.add(z);
+				error_time--;
+				if(error_time == 0){
+					resetDatas();
+				}
+				return false;
 			}
-			Log.e("test","endata"+len);
-			return true;
+			
 		}
 		public boolean resetDatas(){
 			Log.e(TAG,"reset");
@@ -67,21 +81,60 @@ class MyDatas{
 			standard_deviation_x_value = 0f;
 			standard_deviation_y_value = 0f;
 			standard_deviation_z_value = 0f;
+			fengdu_x_value = 0f;
+			fengdu_y_value = 0f;
+			fengdu_z_value = 0f;
+			used = false;
+			using = false;
+			error_time =  5;
 			return true;
 		}
 		public void calculate(){
 			Log.e(TAG,"calculate");
+			using = true;
 			sum();
 			meanValue();
 			nVariance();
 			standardDeviation();
+			using = false;
 			Log.e(TAG,"calculate over.");
 		}
+		
+		public boolean fengdu(){
+			if(HeadWear.DEBUG){
+				Log.i(TAG,"fengdu");
+			}
+			for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
+				fengdu_x_value += Math.pow((data_x.get(i) - mean_x_value),4);
+				fengdu_y_value += Math.pow((data_x.get(i) - mean_y_value),4);
+				fengdu_z_value += Math.pow((data_x.get(i) - mean_z_value),4);
+			}
+			fengdu_x_value = (float) (fengdu_x_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_x_value, 4)));
+			fengdu_y_value = (float) (fengdu_y_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_y_value, 4)));
+			fengdu_z_value = (float) (fengdu_z_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_z_value, 4)));
+			return true;
+		}
+		
+		public boolean skewness(){
+			if(HeadWear.DEBUG){
+				Log.i(TAG,"skewness");
+			}
+			for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
+				skewness_x_value += Math.pow((data_x.get(i) - mean_x_value),3);
+				skewness_y_value += Math.pow((data_y.get(i) - mean_y_value),3);
+				skewness_z_value += Math.pow((data_z.get(i) - mean_z_value),3);
+			}
+			skewness_x_value = (float) ((LEN_OF_SIGNAL_DATA * skewness_x_value) / ((LEN_OF_SIGNAL_DATA - 1) * (LEN_OF_SIGNAL_DATA - 2) * Math.pow(standard_deviation_x_value, 3)));
+			skewness_y_value = (float) ((LEN_OF_SIGNAL_DATA * skewness_y_value) / ((LEN_OF_SIGNAL_DATA - 1) * (LEN_OF_SIGNAL_DATA - 2) * Math.pow(standard_deviation_y_value, 3)));
+			skewness_z_value = (float) ((LEN_OF_SIGNAL_DATA * skewness_z_value) / ((LEN_OF_SIGNAL_DATA - 1) * (LEN_OF_SIGNAL_DATA - 2) * Math.pow(standard_deviation_z_value, 3)));
+			return true;
+		}
+		
 		public boolean standardDeviation(){
 			Log.i(TAG,"standardDeviation");
-			standard_deviation_x_value = (float) Math.sqrt(LEN_OF_SIGNAL_DATA * n_variance_x_value);
-			standard_deviation_y_value = (float) Math.sqrt(LEN_OF_SIGNAL_DATA * n_variance_y_value);
-			standard_deviation_z_value = (float) Math.sqrt(LEN_OF_SIGNAL_DATA * n_variance_z_value);
+			standard_deviation_x_value = (float) Math.sqrt(n_variance_x_value / LEN_OF_SIGNAL_DATA);
+			standard_deviation_y_value = (float) Math.sqrt(n_variance_x_value / LEN_OF_SIGNAL_DATA);
+			standard_deviation_z_value = (float) Math.sqrt(n_variance_x_value / LEN_OF_SIGNAL_DATA);
 			if(HeadWear.DEBUG){
 				Log.i(TAG + "standardDeviation","" + standard_deviation_x_value);
 				Log.i(TAG + "standardDeviation","" + standard_deviation_y_value);
