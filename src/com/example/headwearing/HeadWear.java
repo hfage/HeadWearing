@@ -36,7 +36,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class HeadWear extends Activity {
@@ -65,12 +68,25 @@ public class HeadWear extends Activity {
 	private ArrayList<Entry> yLineChartVals1 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals2 = new ArrayList<Entry>();
 	private ArrayList<Entry> yLineChartVals3 = new ArrayList<Entry>();
+	private TextView tv;
+	private Button button1;
+	private Button button2;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_head_wear);
 		registerReceiver(mBLEDateUpdateReciver,makeBLEIntentFilter());
+		initView();
+	}
+	
+	public void initView(){
+		tv = (TextView) findViewById(R.id.msg);
+		button1 = (Button) findViewById(R.id.button1);
+		button2 = (Button) findViewById(R.id.button2);
+		button1.setOnClickListener(new ClickEvent());
+		button2.setOnClickListener(new ClickEvent());
+		
 		mBarChart = (BarChart) findViewById(R.id.barchart);
 		if(viewAcceleration){
 			mBarChart.setDrawYValues(false);
@@ -134,6 +150,23 @@ public class HeadWear extends Activity {
 //		//requestFocus();
 //		mWebView.requestFocus();
 //		mWebView.loadUrl("http://www.baidu.com");
+	}
+	
+	class ClickEvent implements OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			if(v == button1){
+				tv.setText("button1 onclick");
+			}else if(v == button2){
+				tv.setText("button2 onclick");
+			}else{
+				
+			}
+			
+		}
+		
 	}
 	
 	public void setBarChartData(float x, float y, float z){

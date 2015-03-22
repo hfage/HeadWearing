@@ -30,9 +30,12 @@ class MyDatas{
 		float skewness_x_value = 0f;
 		float skewness_y_value = 0f;
 		float skewness_z_value = 0f;
-		float fengdu_x_value = 0f;
-		float fengdu_y_value = 0f;
-		float fengdu_z_value = 0f;
+		float kurtosis_x_value = 0f;
+		float kurtosis_y_value = 0f;
+		float kurtosis_z_value = 0f;
+		float correlation_x_y_value = 0f;
+		float correlation_y_z_value = 0f;
+		float correlation_z_x_value = 0f;
 		public boolean used = false;
 		public boolean using = false;
 		public int error_time = 5;
@@ -44,7 +47,7 @@ class MyDatas{
 					data_y.add(y);
 					data_z.add(z);
 				}else{
-					Log.e("test","else");
+					Log.w("test","else");
 					data_x.remove(0);
 					data_x.add(x);
 					data_y.remove(0);
@@ -52,7 +55,7 @@ class MyDatas{
 					data_z.remove(0);
 					data_z.add(z);
 				}
-				//Log.e("test","endata"+len);
+				//Log.w("test","endata"+len);
 				return true;
 			}else{
 				error_time--;
@@ -64,7 +67,7 @@ class MyDatas{
 			
 		}
 		public boolean resetDatas(){
-			Log.e(TAG,"reset");
+			Log.w(TAG,"reset");
 			data_x.clear();
 			data_y.clear();
 			data_z.clear();
@@ -81,43 +84,86 @@ class MyDatas{
 			standard_deviation_x_value = 0f;
 			standard_deviation_y_value = 0f;
 			standard_deviation_z_value = 0f;
-			fengdu_x_value = 0f;
-			fengdu_y_value = 0f;
-			fengdu_z_value = 0f;
+			kurtosis_x_value = 0f;
+			kurtosis_y_value = 0f;
+			kurtosis_z_value = 0f;
+			correlation_x_y_value = 0f;
+			correlation_y_z_value = 0f;
+			correlation_z_x_value = 0f;
 			used = false;
 			using = false;
 			error_time =  5;
 			return true;
 		}
 		public void calculate(){
-			Log.e(TAG,"calculate");
+			Log.w(TAG,"calculate");
 			using = true;
 			sum();
 			meanValue();
 			nVariance();
 			standardDeviation();
+			kurtosis();
+			correlation();
 			using = false;
-			Log.e(TAG,"calculate over.");
+			Log.w(TAG,"calculate over.");
+			if(HeadWear.DEBUG){
+				Log.w(TAG + "meanValue:", "" + mean_x_value);
+				Log.w(TAG + "meanValue:", "" + mean_y_value);
+				Log.w(TAG + "meanValue:", "" + mean_z_value);
+				Log.w(TAG + "n_variance:Value", "" + n_variance_x_value);
+				Log.w(TAG + "n_varianceValue:", "" + n_variance_y_value);
+				Log.w(TAG + "n_varianceValue:", "" + n_variance_z_value);
+				Log.w(TAG + "standar_deviationValue:", "" + standard_deviation_x_value);
+				Log.w(TAG + "standar_deviationValue:", "" + standard_deviation_y_value);
+				Log.w(TAG + "standar_deviationValue:", "" + standard_deviation_z_value);
+				Log.w(TAG + "kurtosisValue:", "" + kurtosis_x_value);
+				Log.w(TAG + "kurtosisValue:", "" + kurtosis_y_value);
+				Log.w(TAG + "kurtosisValue:", "" + kurtosis_z_value);
+				Log.w(TAG + "correlationValue:", "" + correlation_x_y_value);
+				Log.w(TAG + "correlationValue:", "" + correlation_y_z_value);
+				Log.w(TAG + "correlationValue:", "" + correlation_z_x_value);
+			}
 		}
 		
-		public boolean fengdu(){
+		public boolean correlation(){
 			if(HeadWear.DEBUG){
-				Log.i(TAG,"fengdu");
+				Log.w(TAG,"method: correlation");
+			}
+			float d_x = 0f;
+			float d_y = 0f;
+			float d_z = 0f;
+			for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
+				d_x = data_x.get(i) - mean_x_value;
+				d_y = data_y.get(i) - mean_y_value;
+				d_z = data_z.get(i) - mean_z_value;
+				correlation_x_y_value += d_x * d_y;
+				correlation_y_z_value += d_y * d_z;
+				correlation_z_x_value += d_z * d_x;
+			}
+			correlation_x_y_value = (float) (correlation_x_y_value / (Math.sqrt(n_variance_x_value * n_variance_y_value)));
+			correlation_y_z_value = (float) (correlation_y_z_value / (Math.sqrt(n_variance_y_value * n_variance_z_value)));
+			correlation_z_x_value = (float) (correlation_z_x_value / (Math.sqrt(n_variance_z_value * n_variance_x_value)));
+			return true;
+		}
+		
+		public boolean kurtosis(){
+			if(HeadWear.DEBUG){
+				Log.w(TAG,"kurtosis");
 			}
 			for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
-				fengdu_x_value += Math.pow((data_x.get(i) - mean_x_value),4);
-				fengdu_y_value += Math.pow((data_x.get(i) - mean_y_value),4);
-				fengdu_z_value += Math.pow((data_x.get(i) - mean_z_value),4);
+				kurtosis_x_value += Math.pow((data_x.get(i) - mean_x_value),4);
+				kurtosis_y_value += Math.pow((data_x.get(i) - mean_y_value),4);
+				kurtosis_z_value += Math.pow((data_x.get(i) - mean_z_value),4);
 			}
-			fengdu_x_value = (float) (fengdu_x_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_x_value, 4)));
-			fengdu_y_value = (float) (fengdu_y_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_y_value, 4)));
-			fengdu_z_value = (float) (fengdu_z_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_z_value, 4)));
+			kurtosis_x_value = (float) (kurtosis_x_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_x_value, 4)));
+			kurtosis_y_value = (float) (kurtosis_y_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_y_value, 4)));
+			kurtosis_z_value = (float) (kurtosis_z_value / (LEN_OF_SIGNAL_DATA * Math.pow(standard_deviation_z_value, 4)));
 			return true;
 		}
 		
 		public boolean skewness(){
 			if(HeadWear.DEBUG){
-				Log.i(TAG,"skewness");
+				Log.w(TAG,"skewness");
 			}
 			for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
 				skewness_x_value += Math.pow((data_x.get(i) - mean_x_value),3);
@@ -131,29 +177,19 @@ class MyDatas{
 		}
 		
 		public boolean standardDeviation(){
-			Log.i(TAG,"standardDeviation");
+			Log.w(TAG,"standardDeviation");
 			standard_deviation_x_value = (float) Math.sqrt(n_variance_x_value / LEN_OF_SIGNAL_DATA);
-			standard_deviation_y_value = (float) Math.sqrt(n_variance_x_value / LEN_OF_SIGNAL_DATA);
-			standard_deviation_z_value = (float) Math.sqrt(n_variance_x_value / LEN_OF_SIGNAL_DATA);
-			if(HeadWear.DEBUG){
-				Log.i(TAG + "standardDeviation","" + standard_deviation_x_value);
-				Log.i(TAG + "standardDeviation","" + standard_deviation_y_value);
-				Log.i(TAG + "standardDeviation","" + standard_deviation_z_value);
-			}
+			standard_deviation_y_value = (float) Math.sqrt(n_variance_y_value / LEN_OF_SIGNAL_DATA);
+			standard_deviation_z_value = (float) Math.sqrt(n_variance_z_value / LEN_OF_SIGNAL_DATA);
 			return true;
 		}
 		public boolean sum(){
-			Log.e(TAG,"sum");
+			Log.w(TAG,"sum");
 			if(len == LEN_OF_SIGNAL_DATA){
 				for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
 					total_x_value += data_x.get(i);
 					total_y_value += data_y.get(i);
 					total_z_value += data_z.get(i);
-				}
-				if(HeadWear.DEBUG){
-					Log.i(TAG + "sum","" + total_x_value);
-					Log.i(TAG + "sum","" + total_y_value);
-					Log.i(TAG + "sum","" + total_z_value);
 				}
 				return true;
 			}else{
@@ -161,32 +197,22 @@ class MyDatas{
 			}
 		}
 		public boolean meanValue(){
-			Log.e(TAG,"meanValue");
+			Log.w(TAG,"meanValue");
 			if(len == LEN_OF_SIGNAL_DATA){
 				mean_x_value = total_x_value / LEN_OF_SIGNAL_DATA;
 				mean_y_value = total_y_value / LEN_OF_SIGNAL_DATA;
 				mean_z_value = total_z_value / LEN_OF_SIGNAL_DATA;
-				if(HeadWear.DEBUG){
-					Log.i(TAG + "meanValue","" + mean_x_value);
-					Log.i(TAG + "meanValue","" + mean_y_value);
-					Log.i(TAG + "meanValue","" + mean_z_value);
-				}
 				return true;
 			}else{
 				return false;
 			}
 		}
 		public boolean nVariance(){
-			Log.e(TAG,"nVariance");
+			Log.w(TAG,"nVariance");
 			for(int i = 0; i < LEN_OF_SIGNAL_DATA; i++){
 				n_variance_x_value += Math.pow((data_x.get(i) - mean_x_value),2);
 				n_variance_y_value += Math.pow((data_y.get(i) - mean_y_value),2);
 				n_variance_z_value += Math.pow((data_z.get(i) - mean_z_value),2);
-			}
-			if(HeadWear.DEBUG){
-				Log.i(TAG + "vVariance","" + n_variance_x_value);
-				Log.i(TAG + "vVariance","" + n_variance_y_value);
-				Log.i(TAG + "vVariance","" + n_variance_z_value);
 			}
 			return true;
 		}
